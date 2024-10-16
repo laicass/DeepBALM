@@ -23,14 +23,14 @@ def image_to_array():
     return image
 
 
-def generate_data(batch_size, m, n):
+def generate_data(size, m, n):
     A = construct_measurement_matrix(m, n)
     A = A.astype(np.float32)
     A = torch.from_numpy(A)
     image_size = int(n**0.5)
     x_gt_list = []
-    for i in range(batch_size):
-        #image = gaussian2D(image_size, sigma_x=0.3, sigma_y=0.7)
+    for i in range(size):
+        #image = gaussian2D(image_size, sigma_x=np.random.rand(), sigma_y=np.random.rand())
         image = image_to_array()
         image = image.reshape(n, 1)
         image = image.astype(np.float32)
@@ -38,11 +38,11 @@ def generate_data(batch_size, m, n):
         x_gt_list.append(image)
     x_gt = torch.stack(x_gt_list)
 
-    b_list = []
-    for x_per_batch in x_gt:
-        b_per_batch = torch.matmul(A, x_per_batch)
-        b_list.append(b_per_batch)
+    observations = []
+    for x in x_gt:
+        b = torch.matmul(A, x)
+        observations.append(b)
 
-    b = torch.stack(b_list)
-    return A, b, x_gt
+    observations = torch.stack(observations)
+    return A, observations, x_gt
 

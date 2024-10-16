@@ -15,41 +15,50 @@ image_size = 30
 m = 2000
 n = image_size*image_size
 batch_size = 1
+dataset_size = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 model = DeepBALM(m, n, num_layer=10)
 model.to(device)
 
-A, b, x_gt = generate_data(batch_size, m, n)
-image_gt = x_gt.numpy()[0].reshape((image_size, image_size))
+A, observations, trainset = generate_data(dataset_size, m, n)
+
+# view dataset
+'''
+for x in x_gt.numpy():
+    x = x.reshape((image_size, image_size))
+    plt.imshow(x)
+    plt.show()
+'''
+
 A = A.to(device)
-b = b.to(device)
-x_gt = x_gt.to(device)
+observations = observations.to(device)
+trainset = trainset.to(device)
+print(trainset.shape, observations.shape)
 
 x_init = torch.rand(batch_size, n, 1).to(device)
-#y = torch.rand(batch_size, m, 1).to(device) #dual
-y_init = np.load("y_init.npy")
-y_init = torch.from_numpy(y_init).to(device)
+y_init = (10000*(torch.rand(batch_size, m, 1)-0.5)).to(device)
 
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 loss_history = []
 
 
-for epoch in range(1000):
-    x_out, y_out, _ = model(x_init, y_init, A, b)
-    loss = torch.mean(torch.pow(x_gt - x_out, 2))
-    loss_history.append(loss.item())
-    print(f"Running epoch {epoch} with loss {loss.item()}")
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+for epoch in range(500):
+    for x_gt, b in zip(trainset, observations):
+        x_out, y_out, _ = model(x_init, y_init, A, b)
+        loss = torch.mean(torch.pow(x_gt - x_out, 2))
+        loss_history.append(loss.item())
+        print(f"Running epoch {epoch} with loss {loss.item()}")
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
 
 output = x_out.detach().to('cpu').numpy()
 image_pred = output[0].reshape((image_size, image_size))
-
+image_gt = trainset.to('cpu').numpy()[0].reshape((image_size, image_size))
 fig, axes = plt.subplots(1, 2)
 axes[0].imshow(image_gt, cmap='gray')
 axes[0].set_title("Ground Truth")
@@ -62,8 +71,9 @@ plt.show()
 
 #np.save("y_init", y.to('cpu').numpy())
 
-
+# test
 x_init = torch.zeros(batch_size, n, 1).to(device)
+test_b = observations[0]
 with torch.no_grad():
     x_out, y_out, x_list = model(x_init, y_init, A, b)
     fig, axes = plt.subplots(3, 4)

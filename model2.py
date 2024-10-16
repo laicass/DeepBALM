@@ -37,7 +37,7 @@ class DeepBALM(nn.Module):
 class PrimalBlock(nn.Module):
     def __init__(self):
         super(PrimalBlock, self).__init__()
-        self.r_inv = nn.Parameter(torch.Tensor([0.0001]))
+        self.r_inv = nn.Parameter(torch.Tensor([0.01]))
 
     def forward(self, x, y, A, b):
         q0k = x + self.r_inv * torch.matmul(A.T, y)
@@ -47,7 +47,7 @@ class PrimalBlock(nn.Module):
 class ProxBlock(nn.Module):
     def __init__(self, n, num_filter=32, size=3):
         super(ProxBlock, self).__init__()
-        self.soft_thr = nn.Parameter(torch.Tensor([0.1]))
+        self.soft_thr = nn.Parameter(torch.Tensor([0.01]))
         self.conv1_forward = nn.Parameter(nn.init.xavier_normal_(torch.Tensor(num_filter, 1, size, size)))
         self.conv2_forward = nn.Parameter(nn.init.xavier_normal_(torch.Tensor(num_filter, num_filter, size, size)))
         self.conv1_backward = nn.Parameter(nn.init.xavier_normal_(torch.Tensor(num_filter, num_filter, size, size)))
