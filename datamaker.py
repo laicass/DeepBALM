@@ -30,8 +30,8 @@ def generate_data(size, m, n):
     image_size = int(n**0.5)
     x_gt_list = []
     for i in range(size):
-        #image = gaussian2D(image_size, sigma_x=np.random.rand(), sigma_y=np.random.rand())
-        image = image_to_array()
+        image = gaussian2D(image_size, sigma_x=np.random.rand(), sigma_y=np.random.rand())
+        #image = image_to_array()
         image = image.reshape(n, 1)
         image = image.astype(np.float32)
         image = torch.from_numpy(image)

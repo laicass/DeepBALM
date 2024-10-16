@@ -45,7 +45,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 loss_history = []
 
 
-for epoch in range(500):
+for epoch in range(1000):
     for x_gt, b in zip(trainset, observations):
         x_out, y_out, _ = model(x_init, y_init, A, b)
         loss = torch.mean(torch.pow(x_gt - x_out, 2))
