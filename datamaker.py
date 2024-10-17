@@ -3,10 +3,11 @@ import torch
 import matplotlib.pyplot as plt
 
 
-def construct_measurement_matrix(M, N):
-    Phi = np.random.randn(M, N)
-    Q, R = np.linalg.qr(Phi)
-    return Q
+def construct_measurement_matrix(short, long):
+    gaus = np.random.randn(long, short)
+    Q, R = np.linalg.qr(gaus)
+    phi = Q.T
+    return phi
 
 def gaussian2D(size, sigma_x=1, sigma_y=1):
     x = np.linspace(-1, 1, size)
@@ -18,7 +19,7 @@ def gaussian2D(size, sigma_x=1, sigma_y=1):
     return z
 
 def image_to_array():
-    image = plt.imread('brain_small.jpeg')
+    image = plt.imread('brain_large.jpeg')
     image = np.mean(image, axis=2)
     return image
 
@@ -30,8 +31,8 @@ def generate_data(size, m, n):
     image_size = int(n**0.5)
     x_gt_list = []
     for i in range(size):
-        image = gaussian2D(image_size, sigma_x=np.random.rand(), sigma_y=np.random.rand())
-        #image = image_to_array()
+        #image = gaussian2D(image_size, sigma_x=np.random.rand(), sigma_y=np.random.rand())
+        image = image_to_array()
         image = image.reshape(n, 1)
         image = image.astype(np.float32)
         image = torch.from_numpy(image)
