@@ -20,6 +20,7 @@ def gaussian2D(size, sigma_x=1, sigma_y=1):
 
 def image_to_array():
     image = plt.imread('brain_large.jpeg')
+    image = plt.imread('man.jpg')
     image = np.mean(image, axis=2)
     return image
 
